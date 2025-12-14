@@ -1,0 +1,28 @@
+body{
+    background-image: url("../images/Telegram-bg.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    backdrop-filter: blur(3px);
+
+}
+
+.wrapper{
+    width: 600px;
+    height: 100vh;
+    margin: 0 auto;
+    background-image: url("../images/Telegram-bg.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    box-shadow: 0 0 5px 1px rgba(1, 173, 1, 0.45) ;
+}
+
+.message-item::before{
+    content: "";
+    position: absolute;
+    border-top: 18px solid transparent;
+    border-left: 18px solid transparent;
+    border-bottom: 18px solid #0088cc;
+    border-right: 18px solid transparent;
+    bottom: 0;
+    right: -16px;
+}
