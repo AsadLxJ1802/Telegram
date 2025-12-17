@@ -3,12 +3,12 @@ body{
     background-repeat: no-repeat;
     background-size: cover;
     backdrop-filter: blur(3px);
+    overflow: hidden;
 
 }
 
 .wrapper{
     width: 600px;
-    height: 100vh;
     margin: 0 auto;
     background-image: url("../images/Telegram-bg.jpg");
     background-repeat: no-repeat;
