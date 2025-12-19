@@ -1,6 +1,7 @@
 let elList = document.querySelector(".list")
 let elMessegForm = document.querySelector(".message-form")
 let elChooseImg = document.querySelector(".img-inp")
+let elCamBtn = document.querySelector(".camera-btn")
 
 let messageList = get("message") || []
 
@@ -21,46 +22,53 @@ function get(key) {
 // Render message start
 function renderMesseng(arr, list) {
     list.innerHTML = ""
+
     arr.forEach(item => {
         let elItem = document.createElement("li")
+        elItem.className = "ml-auto w-[80%]"
+
         if (item.image) {
             elItem.innerHTML = `
-            <li class="bg-[#0088cc] relative message-item ml-auto p-2 rounded-tl-[18px] rounded-bl-[18px] rounded-tr-[15px] text-white text-shadow-md  text-[16px] w-[80%]">
-                <img class="w-full rounded-[18px]" src="${item.image}" alt="Img">
-                <p>${item.content}</p>
-                <div class="text-end text-[12px]">
-                    <span>${item.createAt}</span>
+                <div class="bg-[#0088cc] p-2 rounded-[18px] text-white">
+                    <img src="${item.image}" class="w-full rounded-[12px]" />
+                    <p>${item.content}</p>
+                    <div class="text-end text-[12px]">${item.createAt}</div>
                 </div>
-            </li>
             `
-        } else {
+        } 
+        else if (item.videoRecord) {
             elItem.innerHTML = `
-            <li class="bg-[#0088cc] relative message-item ml-auto p-2 rounded-tl-[18px] rounded-bl-[18px] rounded-tr-[15px] text-white text-shadow-md  text-[16px] w-[80%]">
-                <p>${item.content}</p>
-                <div class="text-end text-[12px]">
-                    <span>${item.createAt}</span>
+                <video class="ml-auto rounded-[30px]" src="${item.videoRecord}" controls></video>
+                <div class="text-end text-[12px] text-white">
+                    ${item.createAt}
                 </div>
-            </li>
             `
-        
-        }
-        if (item.audio) {
+        } 
+        else if (item.audio) {
             elItem.innerHTML = `
-            <li class="bg-[#0088cc] ml-auto p-2 rounded-[18px] text-white w-[80%]">
-                <audio controls class="w-full">
-                    <source src="${item.audio}" type="audio/webm">
-                </audio>
-                <div class="text-end text-[12px]">
-                    <span>${item.createAt}</span>
+                <div class="bg-[#0088cc] p-2 rounded-[18px]">
+                    <audio controls class="w-full">
+                        <source src="${item.audio}" type="audio/webm">
+                    </audio>
+                    <div class="text-end text-[12px] text-white">
+                        ${item.createAt}
+                    </div>
                 </div>
-            </li>
+            `
+        } 
+        else {
+            elItem.innerHTML = `
+                <div class="bg-[#0088cc] p-2 rounded-[18px] text-white">
+                    <p>${item.content}</p>
+                    <div class="text-end text-[12px]">${item.createAt}</div>
+                </div>
             `
         }
+
         list.appendChild(elItem)
     })
 }
 
-renderMesseng(messageList, elList)
 // Render message end
 
 // Choose img start
@@ -81,6 +89,8 @@ elMessegForm.addEventListener("submit", (evt) => {
         image: imgUrl,
         content: evt.target.message.value,
         createAt: time,
+        videoRecord:videoUrl
+
     }
 
     messageList.push(data)
@@ -89,6 +99,7 @@ elMessegForm.addEventListener("submit", (evt) => {
 
     imgUrl = null
     evt.target.reset()
+    videoUrl = null
 })
 // Submit message end
 let micBtn = document.querySelector("#micBtn")
@@ -132,5 +143,49 @@ micBtn.addEventListener("click", async () => {
         micBtn.classList.remove("opacity-50")
     }
 })
+
+
+
+let mediaRecorder2
+let videoChunks = []
+
+elCamBtn.addEventListener("mousedown", async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+    })
+
+    mediaRecorder2 = new MediaRecorder(stream)
+    videoChunks = []
+
+    mediaRecorder2.ondataavailable = e => {
+        videoChunks.push(e.data)
+    }
+
+    mediaRecorder2.start()
+})
+
+elCamBtn.addEventListener("mouseup", () => {
+    mediaRecorder2.onstop = () => {
+        const videoBlob = new Blob(videoChunks, { type: "video/webm" })
+        const videoUrl = URL.createObjectURL(videoBlob)
+
+        const date = new Date()
+        const time = `${date.getHours()}:${date.getMinutes()}`
+
+        const data = {
+            id: messageList.length ? messageList.at(-1).id + 1 : 1,
+            videoRecord: videoUrl,
+            createAt: time
+        }
+
+        messageList.push(data)
+        renderMesseng(messageList, elList)
+    }
+
+    mediaRecorder2.stop()
+})
+
+
 
 
